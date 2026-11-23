@@ -1,0 +1,10 @@
+pandas
+scikit-learn
+mlflow
+fastapi
+uvicorn
+pydantic
+dvc[azure]
+pytest
+httpx
+ruff
