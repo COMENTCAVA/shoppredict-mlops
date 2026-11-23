@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/raw/
+test_model/
+mlruns/
+decision.json
+.dvc/config.local
+.dvc/tmp
+.dvc/cache
