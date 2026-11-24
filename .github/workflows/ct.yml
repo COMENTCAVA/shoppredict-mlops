@@ -1,0 +1,108 @@
+name: CT
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Pipeline ou rollback
+        type: choice
+        required: true
+        default: pipeline
+        options: [pipeline, rollback]
+      dataset_version:
+        description: Version des données (pipeline)
+        type: choice
+        required: true
+        default: v1
+        options: [v1, v2]
+      rollback_to:
+        description: Version du modèle à restaurer (rollback)
+        type: string
+        required: false
+      registry:
+        description: Modèle MLflow (production ou démo staging)
+        type: choice
+        required: true
+        default: shoppredict
+        options: [shoppredict, shoppredict-staging]
+      model_type:
+        description: Algorithme du candidat (pipeline)
+        type: choice
+        required: true
+        default: random_forest
+        options: [random_forest, logistic_regression]
+
+concurrency:
+  group: ct
+  cancel-in-progress: false
+
+jobs:
+  ct:
+    runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI }}
+      MLFLOW_TRACKING_USERNAME: ${{ vars.MLFLOW_TRACKING_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+      MODEL_NAME: ${{ inputs.registry }}
+      MODEL_TYPE: ${{ inputs.model_type }}
+      MODEL_ALIAS: champion
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Pull data
+        if: inputs.operation == 'pipeline'
+        env:
+          AZURE_SAS_TOKEN: ${{ secrets.AZURE_SAS_TOKEN }}
+          DATASET_VERSION: ${{ inputs.dataset_version }}
+        run: |
+          dvc remote modify --local myazure sas_token "$AZURE_SAS_TOKEN"
+          dvc pull "data/$DATASET_VERSION" data/eval.csv
+
+      - name: Pipeline
+        if: inputs.operation == 'pipeline'
+        env:
+          DATASET_VERSION: ${{ inputs.dataset_version }}
+        run: python -m ml.pipeline --version "$DATASET_VERSION" | tee run.log
+
+      - name: Rollback
+        if: inputs.operation == 'rollback'
+        env:
+          ROLLBACK_TO: ${{ inputs.rollback_to }}
+        run: python -m ml.rollback --to-version "$ROLLBACK_TO" | tee run.log
+
+      - name: Decision
+        id: decision
+        run: |
+          tail -n 1 run.log > decision.json
+          echo "decision=$(jq -r .decision decision.json)" >> "$GITHUB_OUTPUT"
+          echo "version=$(jq -r .champion_version decision.json)" >> "$GITHUB_OUTPUT"
+          echo "### $(jq -r .decision decision.json) : champion v$(jq -r .champion_version decision.json)" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.reason // empty' decision.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Refresh production
+        if: steps.decision.outputs.decision != 'retained' && inputs.registry == 'shoppredict' && vars.PROD_URL != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK"
+
+      - name: Verify live
+        if: steps.decision.outputs.decision != 'retained' && inputs.registry == 'shoppredict' && vars.PROD_URL != ''
+        env:
+          SMOKE_TIMEOUT: 300
+        run: bash scripts/smoke.sh "${{ vars.PROD_URL }}" "${{ steps.decision.outputs.version }}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: decision
+          path: |
+            decision.json
+            run.log
+          if-no-files-found: ignore

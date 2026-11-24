@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI }}
+      MLFLOW_TRACKING_USERNAME: ${{ vars.MLFLOW_TRACKING_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install mlflow-skinny
+
+      - name: Champion version
+        id: champion
+        run: |
+          version=$(python -c "from mlflow import MlflowClient; print(MlflowClient().get_model_version_by_alias('shoppredict', 'champion').version)")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify image builds
+        run: docker build -t "shoppredict:$GITHUB_SHA" .
+
+      - name: Deploy this commit to Render
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK&ref=$GITHUB_SHA"
+
+      - name: Wait for the new deploy
+        run: sleep 60
+
+      - name: Live smoke test
+        env:
+          SMOKE_TIMEOUT: 600
+        run: bash scripts/smoke.sh "${{ vars.PROD_URL }}" "${{ steps.champion.outputs.version }}"
+
+      - name: Summary
+        run: echo "Commit $GITHUB_SHA deployed to ${{ vars.PROD_URL }} with model v${{ steps.champion.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"

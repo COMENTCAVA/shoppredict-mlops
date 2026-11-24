@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>ShopPredict</title>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --panel: #ffffff;
+  --ink: #1c2733;
+  --muted: #5b6978;
+  --line: #d8dfe7;
+  --accent: #1d5f8f;
+  --accent-ink: #ffffff;
+  --yes: #1b7a4b;
+  --no: #6b7785;
+  --error: #b3392b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151b22;
+    --panel: #1d252e;
+    --ink: #e6ebf0;
+    --muted: #9aa8b6;
+    --line: #34404c;
+    --accent: #6db3e8;
+    --accent-ink: #102130;
+    --yes: #55c58a;
+    --no: #93a1af;
+    --error: #ff8d7d;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.01em; }
+#version { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+}
+form, .result {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+}
+.examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px; }
+.examples span { color: var(--muted); font-size: 0.9rem; }
+#example-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+fieldset { border: 0; margin: 0 0 20px; padding: 0; }
+legend { font-weight: 600; padding: 0; margin-bottom: 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.875rem; color: var(--muted); }
+label.check { flex-direction: row; align-items: center; gap: 8px; align-self: end; padding-bottom: 9px; }
+input, select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+input[type="checkbox"] { width: 18px; height: 18px; padding: 0; }
+button { font: inherit; font-weight: 600; border-radius: 6px; padding: 10px 16px; cursor: pointer; }
+button.primary { width: 100%; background: var(--accent); color: var(--accent-ink); border: 0; }
+button.example { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.result { position: sticky; top: 16px; }
+.result h2 { margin: 0 0 8px; font-size: 1rem; color: var(--muted); font-weight: 600; }
+#percent { margin: 0; font-size: 3.5rem; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gauge { position: relative; height: 10px; margin: 16px 0 6px; background: var(--line); border-radius: 5px; }
+#bar { height: 100%; width: 0; border-radius: 5px; background: var(--no); transition: width 0.4s ease; }
+.tick { position: absolute; left: 50%; top: -4px; width: 2px; height: 18px; background: var(--ink); }
+.scale { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+#verdict { margin: 16px 0 4px; font-size: 1.15rem; font-weight: 600; }
+#used { margin: 0; font-size: 0.875rem; color: var(--muted); }
+.yes #bar { background: var(--yes); }
+.yes #verdict { color: var(--yes); }
+.error #verdict { color: var(--error); }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .result { position: static; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #bar { transition: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>ShopPredict</h1>
+    <p id="version">Chargement du modèle…</p>
+  </header>
+  <div class="layout">
+    <form id="form">
+      <div class="examples">
+        <span>Exemples réels</span>
+        <div id="example-buttons"></div>
+      </div>
+
+      <fieldset>
+        <legend>Pages consultées</legend>
+        <div class="grid">
+          <label>Pages administratives<input name="Administrative" type="number" min="0" step="1" required></label>
+          <label>Durée administratives (s)<input name="Administrative_Duration" type="number" min="0" step="any" required></label>
+          <label>Pages d’information<input name="Informational" type="number" min="0" step="1" required></label>
+          <label>Durée information (s)<input name="Informational_Duration" type="number" min="0" step="any" required></label>
+          <label>Pages produit<input name="ProductRelated" type="number" min="0" step="1" required></label>
+          <label>Durée produit (s)<input name="ProductRelated_Duration" type="number" min="0" step="any" required></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Comportement</legend>
+        <div class="grid">
+          <label>Taux de rebond (0 à 1)<input name="BounceRates" type="number" min="0" max="1" step="any" required></label>
+          <label>Taux de sortie (0 à 1)<input name="ExitRates" type="number" min="0" max="1" step="any" required></label>
+          <label>Valeur des pages<input name="PageValues" type="number" min="0" step="any" required></label>
+          <label>Proximité d’un jour spécial (0 à 1)<input name="SpecialDay" type="number" min="0" max="1" step="any" required></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Visiteur et contexte</legend>
+        <div class="grid">
+          <label>Type de visiteur
+            <select name="VisitorType">
+              <option value="Returning_Visitor">Visiteur récurrent</option>
+              <option value="New_Visitor">Nouveau visiteur</option>
+              <option value="Other">Autre</option>
+            </select>
+          </label>
+          <label>Système d’exploitation (code)<input name="OperatingSystems" type="number" min="1" step="1" required></label>
+          <label>Navigateur (code)<input name="Browser" type="number" min="1" step="1" required></label>
+          <label>Région (1 à 9)<input name="Region" type="number" min="1" max="9" step="1" required></label>
+          <label>Type de trafic (code)<input name="TrafficType" type="number" min="1" step="1" required></label>
+          <label class="check"><input name="Weekend" type="checkbox">Session en week-end</label>
+        </div>
+      </fieldset>
+
+      <button class="primary" type="submit">Prédire</button>
+    </form>
+
+    <section class="result" id="result" aria-live="polite">
+      <h2>Probabilité d’achat</h2>
+      <p id="percent">–</p>
+      <div class="gauge"><div id="bar"></div><div class="tick"></div></div>
+      <div class="scale"><span>0 %</span><span>seuil 50 %</span><span>100 %</span></div>
+      <p id="verdict">Remplissez le formulaire ou choisissez un exemple, puis cliquez sur Prédire.</p>
+      <p id="used"></p>
+    </section>
+  </div>
+</main>
+
+<script type="application/json" id="examples">
+{
+  "Session acheteuse": {
+    "Administrative": 9,
+    "Administrative_Duration": 192.92,
+    "Informational": 2,
+    "Informational_Duration": 114.5,
+    "ProductRelated": 60,
+    "ProductRelated_Duration": 1394.24,
+    "BounceRates": 0.0,
+    "ExitRates": 0.003,
+    "PageValues": 63.65,
+    "SpecialDay": 0.0,
+    "OperatingSystems": 2,
+    "Browser": 2,
+    "Region": 7,
+    "TrafficType": 2,
+    "VisitorType": "Returning_Visitor",
+    "Weekend": false
+  },
+  "Session qui rebondit": {
+    "Administrative": 0,
+    "Administrative_Duration": 0.0,
+    "Informational": 0,
+    "Informational_Duration": 0.0,
+    "ProductRelated": 1,
+    "ProductRelated_Duration": 0.0,
+    "BounceRates": 0.2,
+    "ExitRates": 0.2,
+    "PageValues": 0.0,
+    "SpecialDay": 0.0,
+    "OperatingSystems": 2,
+    "Browser": 2,
+    "Region": 2,
+    "TrafficType": 1,
+    "VisitorType": "Returning_Visitor",
+    "Weekend": false
+  }
+}
+</script>
+<script>
+const form = document.getElementById("form");
+const result = document.getElementById("result");
+const examples = JSON.parse(document.getElementById("examples").textContent);
+
+function fill(data) {
+  for (const [name, value] of Object.entries(data)) {
+    const input = form.elements[name];
+    if (input.type === "checkbox") input.checked = value;
+    else input.value = value;
+  }
+}
+
+function collect() {
+  const body = {};
+  for (const input of form.elements) {
+    if (!input.name) continue;
+    if (input.type === "checkbox") body[input.name] = input.checked;
+    else if (input.type === "number") body[input.name] = Number(input.value);
+    else body[input.name] = input.value;
+  }
+  return body;
+}
+
+function show(state, percent, bar, verdict, used) {
+  result.className = "result " + state;
+  document.getElementById("percent").textContent = percent;
+  document.getElementById("bar").style.width = bar + "%";
+  document.getElementById("verdict").textContent = verdict;
+  document.getElementById("used").textContent = used;
+  result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+for (const [label, data] of Object.entries(examples)) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "example";
+  button.textContent = label;
+  button.addEventListener("click", () => fill(data));
+  document.getElementById("example-buttons").append(button);
+}
+fill(Object.values(examples)[0]);
+
+fetch("/model-info")
+  .then((response) => (response.ok ? response.json() : Promise.reject()))
+  .then((info) => {
+    document.getElementById("version").textContent = `Modèle ${info.alias} · version ${info.version}`;
+  })
+  .catch(() => {
+    document.getElementById("version").textContent = "Modèle indisponible";
+  });
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  try {
+    const response = await fetch("/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collect()),
+    });
+    if (response.status === 422) {
+      const error = (await response.json()).detail[0];
+      return show("error", "–", 0, `Valeur invalide : ${error.loc[error.loc.length - 1]}`, "");
+    }
+    if (!response.ok) {
+      return show("error", "–", 0, "Modèle indisponible, réessayez dans un instant.", "");
+    }
+    const data = await response.json();
+    const percent = (data.probability * 100).toLocaleString("fr-FR", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+    show(
+      data.purchase ? "yes" : "no",
+      `${percent} %`,
+      data.probability * 100,
+      data.purchase ? "Achat probable" : "Achat peu probable",
+      `Prédiction faite avec la version ${data.model_version} du modèle.`
+    );
+  } catch {
+    show("error", "–", 0, "Service injoignable.", "");
+  }
+});
+</script>
+</body>
+</html>
