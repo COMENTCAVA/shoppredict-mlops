@@ -1,12 +1,13 @@
 
 import argparse
 import json
+import os
 import sys
 
 from mlflow import MlflowClient
 from mlflow.exceptions import MlflowException
 
-MODEL_NAME = "shoppredict"
+MODEL_NAME = os.getenv("MODEL_NAME", "shoppredict")
 MODEL_ALIAS = "champion"
 
 
