@@ -1,0 +1,15 @@
+.git
+.github
+.dvc
+data/
+ml/
+tests/
+scripts/
+test_model/
+mlruns/
+.env
+*.ipynb
+**/__pycache__
+.pytest_cache
+.ruff_cache
+.venv
