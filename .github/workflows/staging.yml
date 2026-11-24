@@ -1,0 +1,42 @@
+name: Staging
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI }}
+      MLFLOW_TRACKING_USERNAME: ${{ vars.MLFLOW_TRACKING_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install mlflow-skinny
+
+      - name: Champion version
+        id: champion
+        run: |
+          version=$(python -c "from mlflow import MlflowClient; print(MlflowClient().get_model_version_by_alias('shoppredict', 'champion').version)")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build release candidate
+        run: docker build -t "shoppredict:$GITHUB_SHA" .
+
+      - name: Run release candidate
+        run: docker run -d --name app -p 8000:8000 -e MLFLOW_TRACKING_URI -e MLFLOW_TRACKING_USERNAME -e MLFLOW_TRACKING_PASSWORD "shoppredict:$GITHUB_SHA"
+
+      - name: Smoke test
+        env:
+          SMOKE_TIMEOUT: 180
+        run: bash scripts/smoke.sh http://localhost:8000 "${{ steps.champion.outputs.version }}"
+
+      - name: Container logs
+        if: always()
+        run: docker logs app || true
