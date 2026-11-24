@@ -19,6 +19,18 @@ on:
         description: Version du modèle à restaurer (rollback)
         type: string
         required: false
+      registry:
+        description: Modèle MLflow (production ou démo staging)
+        type: choice
+        required: true
+        default: shoppredict
+        options: [shoppredict, shoppredict-staging]
+      model_type:
+        description: Algorithme du candidat (pipeline)
+        type: choice
+        required: true
+        default: random_forest
+        options: [random_forest, logistic_regression]
 
 concurrency:
   group: ct
@@ -31,7 +43,8 @@ jobs:
       MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI }}
       MLFLOW_TRACKING_USERNAME: ${{ vars.MLFLOW_TRACKING_USERNAME }}
       MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
-      MODEL_NAME: shoppredict
+      MODEL_NAME: ${{ inputs.registry }}
+      MODEL_TYPE: ${{ inputs.model_type }}
       MODEL_ALIAS: champion
     steps:
       - uses: actions/checkout@v4
@@ -74,13 +87,13 @@ jobs:
           jq -r '.reason // empty' decision.json >> "$GITHUB_STEP_SUMMARY"
 
       - name: Refresh production
-        if: steps.decision.outputs.decision != 'retained' && vars.PROD_URL != ''
+        if: steps.decision.outputs.decision != 'retained' && inputs.registry == 'shoppredict' && vars.PROD_URL != ''
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK"
 
       - name: Verify live
-        if: steps.decision.outputs.decision != 'retained' && vars.PROD_URL != ''
+        if: steps.decision.outputs.decision != 'retained' && inputs.registry == 'shoppredict' && vars.PROD_URL != ''
         env:
           SMOKE_TIMEOUT: 300
         run: bash scripts/smoke.sh "${{ vars.PROD_URL }}" "${{ steps.decision.outputs.version }}"

@@ -147,7 +147,7 @@ def log_experiment(model, train_df, eval_df, params, version):
     model_info = mlflow.sklearn.log_model(
         model,
         name="model",
-        registered_model_name="shoppredict",
+        registered_model_name=os.getenv("MODEL_NAME", "shoppredict"),
         serialization_format="cloudpickle",
         input_example=train_df[FEATURES].head(5),
     )
