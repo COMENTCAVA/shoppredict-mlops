@@ -53,7 +53,7 @@ section.group { padding: 16px; border-bottom: 1px solid var(--border-muted); }
 section.group h3 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px 16px; }
 label { display: flex; flex-direction: column; gap: 6px; font-weight: 500; }
-label small { font-weight: 400; color: var(--muted); }
+label small { font-weight: 400; color: var(--muted); margin-left: 4px; }
 input, select {
   font: inherit; color: var(--text); background: var(--surface);
   border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; height: 32px; min-width: 0;
@@ -119,21 +119,21 @@ footer a:hover { text-decoration: underline; }
         <h3>Pages consultées</h3>
         <div class="grid">
           <label>Pages administratives<input name="Administrative" type="number" min="0" step="1" required></label>
-          <label>Durée administratives <small>secondes</small><input name="Administrative_Duration" type="number" min="0" step="any" required></label>
+          <label><span>Durée administratives <small>secondes</small></span><input name="Administrative_Duration" type="number" min="0" step="any" required></label>
           <label>Pages d’information<input name="Informational" type="number" min="0" step="1" required></label>
-          <label>Durée information <small>secondes</small><input name="Informational_Duration" type="number" min="0" step="any" required></label>
+          <label><span>Durée information <small>secondes</small></span><input name="Informational_Duration" type="number" min="0" step="any" required></label>
           <label>Pages produit<input name="ProductRelated" type="number" min="0" step="1" required></label>
-          <label>Durée produit <small>secondes</small><input name="ProductRelated_Duration" type="number" min="0" step="any" required></label>
+          <label><span>Durée produit <small>secondes</small></span><input name="ProductRelated_Duration" type="number" min="0" step="any" required></label>
         </div>
       </section>
 
       <section class="group">
         <h3>Comportement</h3>
         <div class="grid">
-          <label>Taux de rebond <small>entre 0 et 1</small><input name="BounceRates" type="number" min="0" max="1" step="any" required></label>
-          <label>Taux de sortie <small>entre 0 et 1</small><input name="ExitRates" type="number" min="0" max="1" step="any" required></label>
+          <label><span>Taux de rebond <small>entre 0 et 1</small></span><input name="BounceRates" type="number" min="0" max="1" step="any" required></label>
+          <label><span>Taux de sortie <small>entre 0 et 1</small></span><input name="ExitRates" type="number" min="0" max="1" step="any" required></label>
           <label>Valeur des pages<input name="PageValues" type="number" min="0" step="any" required></label>
-          <label>Proximité d’un jour spécial <small>entre 0 et 1</small><input name="SpecialDay" type="number" min="0" max="1" step="any" required></label>
+          <label><span>Proximité d’un jour spécial <small>entre 0 et 1</small></span><input name="SpecialDay" type="number" min="0" max="1" step="any" required></label>
         </div>
       </section>
 
@@ -147,10 +147,10 @@ footer a:hover { text-decoration: underline; }
               <option value="Other">Autre</option>
             </select>
           </label>
-          <label>Système d’exploitation <small>code</small><input name="OperatingSystems" type="number" min="1" step="1" required></label>
-          <label>Navigateur <small>code</small><input name="Browser" type="number" min="1" step="1" required></label>
-          <label>Région <small>entre 1 et 9</small><input name="Region" type="number" min="1" max="9" step="1" required></label>
-          <label>Type de trafic <small>code</small><input name="TrafficType" type="number" min="1" step="1" required></label>
+          <label><span>Système d’exploitation <small>code</small></span><input name="OperatingSystems" type="number" min="1" step="1" required></label>
+          <label><span>Navigateur <small>code</small></span><input name="Browser" type="number" min="1" step="1" required></label>
+          <label><span>Région <small>entre 1 et 9</small></span><input name="Region" type="number" min="1" max="9" step="1" required></label>
+          <label><span>Type de trafic <small>code</small></span><input name="TrafficType" type="number" min="1" step="1" required></label>
           <label class="check"><input name="Weekend" type="checkbox">Session en week-end</label>
         </div>
       </section>
