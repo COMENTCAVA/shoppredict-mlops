@@ -9,7 +9,7 @@
 - License: CC BY 4.0
 - Download date: 2026-11-23
 
-The dataset contains 12,330 e-commerce browsing sessions.
+The dataset contains 12,330 e-commerce browsing sessions from the website Columbia.
 
 Each row represents one session. Revenue indicates whether the session resulted in a purchase.
 
@@ -59,14 +59,14 @@ Data is tracked using DVC and stored in Azure Blob Storage.
 ### Version V1
 
 - Git tag: data-v1
-- Git commit: 5c9a78c
+- Git commit: 7e8e4d2
 - DVC file: data/v1.dvc
 - DVC MD5: 02fd83f80c363c458134f3ac1895b499.dir
 
 ### Version V2
 
 - Git tag: data-v2
-- Git commit: 2b083f5
+- Git commit: 37001eb
 - DVC file: data/v2.dvc
 - DVC MD5: 733eda7bb552030ec3b710b3b298a68c.dir
 
