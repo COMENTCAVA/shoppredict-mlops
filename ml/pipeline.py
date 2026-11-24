@@ -21,10 +21,10 @@ from ml.train import (
 )
 from ml.validate import TARGET, validate
 
-MODEL_NAME = "shoppredict"
+MODEL_NAME = os.getenv("MODEL_NAME", "shoppredict")
 MODEL_ALIAS = "champion"
 
-PARAMS = {"model": "random_forest"}
+PARAMS = {"model": os.getenv("MODEL_TYPE", "random_forest")}
 
 
 def get_champion(client):
