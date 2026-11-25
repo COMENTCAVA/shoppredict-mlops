@@ -18,7 +18,7 @@ EXAMPLES = json.loads(
         re.DOTALL,
     ).group(1)
 )
-VALID = EXAMPLES["Session acheteuse"]
+VALID = EXAMPLES["Likely buyer"]
 
 
 def valid_with(**changes):
@@ -83,8 +83,8 @@ class TestPrediction:
         assert 0 <= response.json()["probability"] <= 1
 
     def test_buying_session_scores_higher_than_bouncing_session(self, client):
-        buyer = client.post("/predict", json=EXAMPLES["Session acheteuse"]).json()
-        bouncer = client.post("/predict", json=EXAMPLES["Session qui rebondit"]).json()
+        buyer = client.post("/predict", json=EXAMPLES["Likely buyer"]).json()
+        bouncer = client.post("/predict", json=EXAMPLES["Quick bounce"]).json()
         assert buyer["probability"] > bouncer["probability"]
 
 

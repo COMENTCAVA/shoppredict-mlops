@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,179 +7,250 @@
 <title>ShopPredict</title>
 <style>
 :root {
-  --bg: #f6f8fa;
+  --bg: #f7f7f8;
   --surface: #ffffff;
-  --text: #1f2328;
-  --muted: #59636e;
-  --border: #d1d9e0;
-  --border-muted: #e5e9ed;
-  --focus: #0969da;
-  --button: #1f2328;
-  --button-text: #ffffff;
-  --ok: #1a7f37;
-  --danger: #cf222e;
+  --text: #18181b;
+  --muted: #6b6b76;
+  --subtle: #9a9aa3;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --ink: #18181b;
+  --focus: #2563eb;
+  --ok: #15803d;
+  --ok-bg: #f0fdf4;
+  --no: #52525b;
+  --danger: #b91c1c;
+  --radius: 8px;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  font: 14px/1.5 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-.topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+header { background: var(--surface); border-bottom: 1px solid var(--border); }
+.bar, main { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+.bar { height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.brand { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.model {
+  font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 10px; font-variant-numeric: tabular-nums;
 }
-.topbar-inner, main { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
-.topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
-.brand { font-size: 16px; font-weight: 600; }
-.status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
-.status.ready .dot { background: var(--ok); }
-.status.down .dot { background: var(--danger); }
-main { padding-top: 32px; padding-bottom: 48px; }
-.intro { margin-bottom: 24px; }
-.intro h1 { margin: 0 0 4px; font-size: 24px; font-weight: 600; }
-.intro p { margin: 0; color: var(--muted); }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
-.box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
-.box-header {
+.model.down { color: var(--danger); border-color: #fecaca; }
+main { padding-top: 40px; padding-bottom: 56px; }
+.intro { max-width: 640px; margin-bottom: 28px; }
+h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+.intro p { margin: 0; color: var(--muted); font-size: 15px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.toolbar {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
 }
-.box-header h2 { margin: 0; font-size: 14px; font-weight: 600; }
-.examples { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-section.group { padding: 16px; border-bottom: 1px solid var(--border-muted); }
-section.group h3 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px 16px; }
-label { display: flex; flex-direction: column; gap: 6px; font-weight: 500; }
-label small { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.toolbar span { color: var(--muted); font-size: 13px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+section { padding: 22px 20px; border-bottom: 1px solid var(--border); }
+section header { background: none; border: 0; margin-bottom: 16px; }
+h2 { margin: 0; font-size: 14px; font-weight: 600; }
+section header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.pages { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px 16px; align-items: center; }
+.pages .head { font-size: 12px; color: var(--subtle); font-weight: 500; }
+.pages .name { font-weight: 500; }
+.pages .name small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > span { font-weight: 500; }
+.field small { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.input { position: relative; }
+.input i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 12px; color: var(--subtle); pointer-events: none; }
 input, select {
-  font: inherit; color: var(--text); background: var(--surface);
-  border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; height: 32px; min-width: 0;
+  width: 100%; height: 36px; padding: 0 10px; font: inherit; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 6px;
+  font-variant-numeric: tabular-nums; transition: border-color 0.15s;
 }
-input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: -1px; border-color: var(--focus); }
-label.check { flex-direction: row; align-items: center; gap: 8px; align-self: end; height: 32px; }
-label.check input { width: 16px; height: 16px; padding: 0; margin: 0; }
-.actions { padding: 16px; display: flex; justify-content: flex-end; }
+.input input { padding-right: 40px; }
+input:hover, select:hover { border-color: var(--subtle); }
+input:focus, select:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+input:invalid:not(:focus):not(:placeholder-shown) { border-color: var(--danger); }
+.switch { display: flex; align-items: center; gap: 10px; height: 36px; cursor: pointer; font-weight: 500; }
+.switch input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
+.actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; }
+.actions span { color: var(--muted); font-size: 13px; }
 button {
-  font: inherit; font-weight: 500; border-radius: 6px; cursor: pointer; height: 32px; padding: 0 12px;
-  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-weight: 500; height: 32px; padding: 0 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); transition: background 0.15s;
 }
-button:hover { background: #eff2f5; }
-button.primary { background: var(--button); color: var(--button-text); border-color: var(--button); padding: 0 20px; }
-button.primary:hover { background: #32383f; }
+button:hover { background: var(--bg); }
 button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.result { position: sticky; top: 24px; }
-.result-body { padding: 16px; }
-.label { margin: 0; color: var(--muted); font-size: 13px; }
-#percent { margin: 4px 0 12px; font-size: 40px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.meter { position: relative; height: 8px; background: var(--border-muted); border-radius: 4px; overflow: hidden; }
-#bar { height: 100%; width: 0; background: var(--text); transition: width 0.3s ease; }
-.threshold { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--muted); }
-.scale { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 12px; }
-#verdict { margin: 16px 0 0; font-weight: 600; }
-.yes #verdict { color: var(--ok); }
-.error #verdict { color: var(--danger); }
-dl { margin: 0; padding: 12px 16px; border-top: 1px solid var(--border-muted); display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+button.primary { height: 38px; padding: 0 20px; background: var(--ink); border-color: var(--ink); color: #fff; }
+button.primary:hover { background: #3f3f46; }
+button:disabled { opacity: 0.6; cursor: default; }
+aside { position: sticky; top: 24px; }
+.result { padding: 22px 20px; }
+.result .label { margin: 0; color: var(--muted); font-size: 13px; }
+#percent { margin: 6px 0 16px; font-size: 44px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.meter { position: relative; height: 6px; background: var(--border); border-radius: 3px; }
+#fill { height: 100%; width: 0; background: var(--ink); border-radius: 3px; transition: width 0.4s ease; }
+.mark { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 2px; background: var(--subtle); border-radius: 1px; }
+.scale { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--subtle); }
+#verdict { margin: 20px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--bg); color: var(--muted); font-size: 13px; }
+.yes #verdict { background: var(--ok-bg); color: var(--ok); font-weight: 500; }
+.yes #fill { background: var(--ok); }
+.no #verdict { color: var(--no); font-weight: 500; }
+.error #verdict { background: #fef2f2; color: var(--danger); }
+dl { margin: 0; padding: 14px 20px; border-top: 1px solid var(--border); display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
 dt { color: var(--muted); }
 dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
-footer { margin-top: 32px; color: var(--muted); font-size: 12px; }
-footer a { color: var(--focus); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
-@media (max-width: 800px) {
+.help { margin: 16px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 12px; display: flex; gap: 16px; }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--text); }
+@media (max-width: 880px) {
+  .bar, main { padding: 0 20px; }
+  main { padding-top: 28px; }
   .layout { grid-template-columns: 1fr; }
-  .result { position: static; }
+  aside { position: static; }
 }
-@media (prefers-reduced-motion: reduce) { #bar { transition: none; } }
+@media (max-width: 560px) {
+  .fields { grid-template-columns: 1fr; }
+  .pages { grid-template-columns: minmax(0, 1fr) 90px 100px; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { #fill, input, button { transition: none; } }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="topbar-inner">
+<header>
+  <div class="bar">
     <span class="brand">ShopPredict</span>
-    <span class="status" id="status"><span class="dot"></span><span id="version">Chargement du modèle</span></span>
+    <span class="model" id="model">Loading model…</span>
   </div>
-</div>
+</header>
 
 <main>
   <div class="intro">
-    <h1>Prédiction d’achat</h1>
-    <p>Estimez la probabilité qu’une session de navigation se termine par un achat.</p>
+    <h1>Will this visitor buy?</h1>
+    <p>Describe one browsing session on an online shop. The model estimates the probability that it ends with a purchase.</p>
   </div>
 
   <div class="layout">
-    <form id="form" class="box">
-      <div class="box-header">
-        <h2>Caractéristiques de la session</h2>
-        <div class="examples"><span>Exemples</span><span id="example-buttons" class="examples"></span></div>
+    <form id="form" class="card" novalidate>
+      <div class="toolbar">
+        <span>Start from an example, then change any value</span>
+        <div class="chips" id="examples-buttons"></div>
       </div>
 
-      <section class="group">
-        <h3>Pages consultées</h3>
-        <div class="grid">
-          <label>Pages administratives<input name="Administrative" type="number" min="0" step="1" required></label>
-          <label><span>Durée administratives <small>secondes</small></span><input name="Administrative_Duration" type="number" min="0" step="any" required></label>
-          <label>Pages d’information<input name="Informational" type="number" min="0" step="1" required></label>
-          <label><span>Durée information <small>secondes</small></span><input name="Informational_Duration" type="number" min="0" step="any" required></label>
-          <label>Pages produit<input name="ProductRelated" type="number" min="0" step="1" required></label>
-          <label><span>Durée produit <small>secondes</small></span><input name="ProductRelated_Duration" type="number" min="0" step="any" required></label>
+      <section>
+        <header>
+          <h2>Pages visited</h2>
+          <p>How many pages of each type the visitor opened, and the total time spent on them.</p>
+        </header>
+        <div class="pages">
+          <span class="head">Page type</span><span class="head">Pages</span><span class="head">Time spent</span>
+          <span class="name">Account pages<small>Login, account settings</small></span>
+          <input name="Administrative" type="number" min="0" step="1" required aria-label="Account pages">
+          <div class="input"><input name="Administrative_Duration" type="number" min="0" step="any" required aria-label="Time on account pages"><i>sec</i></div>
+          <span class="name">Information pages<small>About, contact, delivery</small></span>
+          <input name="Informational" type="number" min="0" step="1" required aria-label="Information pages">
+          <div class="input"><input name="Informational_Duration" type="number" min="0" step="any" required aria-label="Time on information pages"><i>sec</i></div>
+          <span class="name">Product pages<small>Product listings and details</small></span>
+          <input name="ProductRelated" type="number" min="0" step="1" required aria-label="Product pages">
+          <div class="input"><input name="ProductRelated_Duration" type="number" min="0" step="any" required aria-label="Time on product pages"><i>sec</i></div>
         </div>
       </section>
 
-      <section class="group">
-        <h3>Comportement</h3>
-        <div class="grid">
-          <label><span>Taux de rebond <small>entre 0 et 1</small></span><input name="BounceRates" type="number" min="0" max="1" step="any" required></label>
-          <label><span>Taux de sortie <small>entre 0 et 1</small></span><input name="ExitRates" type="number" min="0" max="1" step="any" required></label>
-          <label>Valeur des pages<input name="PageValues" type="number" min="0" step="any" required></label>
-          <label><span>Proximité d’un jour spécial <small>entre 0 et 1</small></span><input name="SpecialDay" type="number" min="0" max="1" step="any" required></label>
-        </div>
-      </section>
-
-      <section class="group">
-        <h3>Visiteur et contexte</h3>
-        <div class="grid">
-          <label>Type de visiteur
-            <select name="VisitorType">
-              <option value="Returning_Visitor">Visiteur récurrent</option>
-              <option value="New_Visitor">Nouveau visiteur</option>
-              <option value="Other">Autre</option>
-            </select>
+      <section>
+        <header>
+          <h2>Engagement</h2>
+          <p>Analytics measures for the pages of this session.</p>
+        </header>
+        <div class="fields">
+          <label class="field"><span>Bounce rate</span>
+            <div class="input"><input name="BounceRates" type="number" min="0" max="1" step="any" required><i>0 – 1</i></div>
+            <small>Share of visitors who left after this page only.</small>
           </label>
-          <label><span>Système d’exploitation <small>code</small></span><input name="OperatingSystems" type="number" min="1" step="1" required></label>
-          <label><span>Navigateur <small>code</small></span><input name="Browser" type="number" min="1" step="1" required></label>
-          <label><span>Région <small>entre 1 et 9</small></span><input name="Region" type="number" min="1" max="9" step="1" required></label>
-          <label><span>Type de trafic <small>code</small></span><input name="TrafficType" type="number" min="1" step="1" required></label>
-          <label class="check"><input name="Weekend" type="checkbox">Session en week-end</label>
+          <label class="field"><span>Exit rate</span>
+            <div class="input"><input name="ExitRates" type="number" min="0" max="1" step="any" required><i>0 – 1</i></div>
+            <small>Share of views that were the last of the visit.</small>
+          </label>
+          <label class="field"><span>Page value</span>
+            <div class="input"><input name="PageValues" type="number" min="0" step="any" required></div>
+            <small>Average value of the pages seen before a purchase. The strongest signal.</small>
+          </label>
+          <label class="field"><span>Closeness to a special day</span>
+            <div class="input"><input name="SpecialDay" type="number" min="0" max="1" step="any" required><i>0 – 1</i></div>
+            <small>0 far from a holiday, 1 right on it (e.g. Valentine's Day).</small>
+          </label>
         </div>
       </section>
 
-      <div class="actions"><button class="primary" type="submit">Lancer la prédiction</button></div>
+      <section>
+        <header>
+          <h2>Visitor and context</h2>
+          <p>Who the visitor is. Codes come from the original dataset.</p>
+        </header>
+        <div class="fields">
+          <label class="field"><span>Visitor type</span>
+            <select name="VisitorType">
+              <option value="Returning_Visitor">Returning visitor</option>
+              <option value="New_Visitor">New visitor</option>
+              <option value="Other">Other</option>
+            </select>
+            <small>Has this visitor been on the shop before?</small>
+          </label>
+          <div class="field"><span>Weekend</span>
+            <label class="switch"><input name="Weekend" type="checkbox">The session happened on a weekend</label>
+          </div>
+          <label class="field"><span>Region</span>
+            <div class="input"><input name="Region" type="number" min="1" max="9" step="1" required><i>1 – 9</i></div>
+            <small>Geographic region code.</small>
+          </label>
+          <label class="field"><span>Traffic source</span>
+            <div class="input"><input name="TrafficType" type="number" min="1" step="1" required></div>
+            <small>Code of the channel the visitor came from.</small>
+          </label>
+          <label class="field"><span>Operating system</span>
+            <div class="input"><input name="OperatingSystems" type="number" min="1" step="1" required></div>
+            <small>Code of the visitor's OS.</small>
+          </label>
+          <label class="field"><span>Browser</span>
+            <div class="input"><input name="Browser" type="number" min="1" step="1" required></div>
+            <small>Code of the visitor's browser.</small>
+          </label>
+        </div>
+      </section>
+
+      <div class="actions">
+        <span>16 inputs sent to <code>POST /predict</code></span>
+        <button class="primary" id="submit" type="submit">Predict</button>
+      </div>
     </form>
 
-    <aside class="box result" id="result" aria-live="polite">
-      <div class="box-header"><h2>Résultat</h2></div>
-      <div class="result-body">
-        <p class="label">Probabilité d’achat</p>
-        <p id="percent">–</p>
-        <div class="meter"><div id="bar"></div><div class="threshold"></div></div>
-        <div class="scale"><span>0 %</span><span>seuil 50 %</span><span>100 %</span></div>
-        <p id="verdict">Renseignez la session puis lancez la prédiction.</p>
+    <aside>
+      <div class="card" id="result" aria-live="polite">
+        <div class="result">
+          <p class="label">Purchase probability</p>
+          <p id="percent">—</p>
+          <div class="meter"><div id="fill"></div><div class="mark"></div></div>
+          <div class="scale"><span>0%</span><span>50% threshold</span><span>100%</span></div>
+          <p id="verdict">Fill in the session and click Predict.</p>
+        </div>
+        <dl>
+          <dt>Model</dt><dd id="model-name">—</dd>
+          <dt>Version</dt><dd id="used">—</dd>
+        </dl>
       </div>
-      <dl>
-        <dt>Modèle</dt><dd id="model-name">–</dd>
-        <dt>Version</dt><dd id="used">–</dd>
-      </dl>
+      <p class="help">Above 50%, the session is classified as a likely purchase. The model is the current champion from the MLflow registry.</p>
     </aside>
   </div>
 
-  <footer>ShopPredict · <a href="/model-info">/model-info</a> · <a href="/docs">Documentation de l’API</a></footer>
+  <footer><span>ShopPredict</span><a href="/model-info">Model info</a><a href="/docs">API documentation</a></footer>
 </main>
 
 <script type="application/json" id="examples">
 {
-  "Session acheteuse": {
+  "Likely buyer": {
     "Administrative": 9,
     "Administrative_Duration": 192.92,
     "Informational": 2,
@@ -197,7 +268,7 @@ footer a:hover { text-decoration: underline; }
     "VisitorType": "Returning_Visitor",
     "Weekend": false
   },
-  "Session qui rebondit": {
+  "Quick bounce": {
     "Administrative": 0,
     "Administrative_Duration": 0.0,
     "Informational": 0,
@@ -220,7 +291,9 @@ footer a:hover { text-decoration: underline; }
 <script>
 const form = document.getElementById("form");
 const result = document.getElementById("result");
+const submit = document.getElementById("submit");
 const examples = JSON.parse(document.getElementById("examples").textContent);
+const percentFormat = new Intl.NumberFormat("en-US", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 function fill(data) {
   for (const [name, value] of Object.entries(data)) {
@@ -228,6 +301,7 @@ function fill(data) {
     if (input.type === "checkbox") input.checked = value;
     else input.value = value;
   }
+  show("", "—", 0, "Click Predict to score this session.");
 }
 
 function collect() {
@@ -241,38 +315,49 @@ function collect() {
   return body;
 }
 
-function show(state, percent, bar, verdict, version) {
-  result.className = "box result " + state;
+function labelOf(name) {
+  const input = form.elements[name];
+  return input.getAttribute("aria-label") || input.closest(".field").querySelector("span").textContent;
+}
+
+function show(state, percent, width, verdict, version) {
+  result.className = "card " + state;
   document.getElementById("percent").textContent = percent;
-  document.getElementById("bar").style.width = bar + "%";
+  document.getElementById("fill").style.width = width + "%";
   document.getElementById("verdict").textContent = verdict;
   if (version) document.getElementById("used").textContent = version;
 }
 
-for (const [label, data] of Object.entries(examples)) {
+for (const name of Object.keys(examples)) {
   const button = document.createElement("button");
   button.type = "button";
-  button.textContent = label;
-  button.addEventListener("click", () => fill(data));
-  document.getElementById("example-buttons").append(button);
+  button.textContent = name;
+  button.addEventListener("click", () => fill(examples[name]));
+  document.getElementById("examples-buttons").append(button);
 }
 fill(Object.values(examples)[0]);
 
 fetch("/model-info")
   .then((response) => (response.ok ? response.json() : Promise.reject()))
   .then((info) => {
-    document.getElementById("status").className = "status ready";
-    document.getElementById("version").textContent = `${info.name} · ${info.alias} · v${info.version}`;
+    document.getElementById("model").textContent = `${info.name} · ${info.alias} · v${info.version}`;
     document.getElementById("model-name").textContent = `${info.name} (${info.alias})`;
     document.getElementById("used").textContent = info.version;
   })
   .catch(() => {
-    document.getElementById("status").className = "status down";
-    document.getElementById("version").textContent = "Modèle indisponible";
+    const model = document.getElementById("model");
+    model.className = "model down";
+    model.textContent = "Model unavailable";
   });
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const invalid = [...form.elements].find((input) => input.name && !input.checkValidity());
+  if (invalid) {
+    invalid.focus();
+    return show("error", "—", 0, `Check “${labelOf(invalid.name)}”: ${invalid.validationMessage}`);
+  }
+  submit.disabled = true;
   try {
     const response = await fetch("/predict", {
       method: "POST",
@@ -281,25 +366,21 @@ form.addEventListener("submit", async (event) => {
     });
     if (response.status === 422) {
       const error = (await response.json()).detail[0];
-      return show("error", "–", 0, `Valeur invalide : ${error.loc[error.loc.length - 1]}`);
+      return show("error", "—", 0, `Invalid value for “${labelOf(error.loc[error.loc.length - 1])}”.`);
     }
-    if (!response.ok) {
-      return show("error", "–", 0, "Modèle indisponible, réessayez dans un instant.");
-    }
+    if (!response.ok) return show("error", "—", 0, "The model is not ready yet. Try again in a moment.");
     const data = await response.json();
-    const percent = (data.probability * 100).toLocaleString("fr-FR", {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
     show(
       data.purchase ? "yes" : "no",
-      `${percent} %`,
+      percentFormat.format(data.probability),
       data.probability * 100,
-      data.purchase ? "Achat probable" : "Achat peu probable",
+      data.purchase ? "Likely to buy" : "Unlikely to buy",
       data.model_version
     );
   } catch {
-    show("error", "–", 0, "Service injoignable.");
+    show("error", "—", 0, "The service cannot be reached.");
+  } finally {
+    submit.disabled = false;
   }
 });
 </script>
